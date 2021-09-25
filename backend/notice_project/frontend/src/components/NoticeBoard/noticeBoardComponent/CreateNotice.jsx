@@ -64,24 +64,21 @@ const initialValues = {
   message: "",
 };
 
-<<<<<<< HEAD
 //form validation && error messages
-const validate = (values) => {
-  let errors = {};
-  if (!values.title) {
-    errors.title = "Subject is required";
-  } else if (values.title.length >= 30) {
-    errors.title = "Not more than 30 characters";
-  } else if (values.title.length <= 4) {
-    errors.title = "Subject is too short";
-  }
+// const validate = (values) => {
+//   let errors = {};
+//   if (!values.title) {
+//     errors.title = "Subject is required";
+//   } else if (values.title.length >= 30) {
+//     errors.title = "Not more than 30 characters";
+//   } else if (values.title.length <= 4) {
+//     errors.title = "Subject is too short";
+//   }
 
-  return errors;
-};
-=======
+//   return errors;
+// };
+
 const maxChars = 1000;
->>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
-
 function CreateNotice() {
   const classes = useStyles();
   const [errorTitle, setErrorTitle] = useState("");
@@ -145,11 +142,8 @@ function CreateNotice() {
       return "handled";
     }
   };
-<<<<<<< HEAD
-=======
 
   //validation for pasted text
->>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
 
   //N.B: Comment: Untested codes. It throws a reference error that makes this page blank!!!
 
@@ -214,11 +208,7 @@ function CreateNotice() {
                       minLength: 5,
                       maxLength: 30,
                     }}
-<<<<<<< HEAD
-                    helperText={errors.title}
-=======
-                    // helperText="You can type 30 characters or less"
->>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
+                    // helperText={errors.title}
                   />
                   <p id="titleError" style={{ color: "red", fontSize: "14px" }}>
                     {errorTitle}
