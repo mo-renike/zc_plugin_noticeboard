@@ -63,6 +63,20 @@ const initialValues = {
   message: "",
 };
 
+//form validation && error messages
+const validate = (values) => {
+  let errors = {};
+  if (!values.title) {
+    errors.title = "Subject is required";
+  } else if (values.title.length >= 30) {
+    errors.title = "Not more than 30 characters";
+  } else if (values.title.length <= 4) {
+    errors.title = "Subject is too short";
+  }
+
+  return errors;
+};
+
 function CreateNotice() {
   const classes = useStyles();
   const [editorState, setEditorState] = useState(() =>
@@ -110,13 +124,13 @@ function CreateNotice() {
       return "handled";
     }
   };
-  //validation for pasted text
 
   //N.B: Comment: Untested codes. It throws a reference error that makes this page blank!!!
 
-  // handlePastedText = (pastedText) => {
+  // const handlePastedText = (pastedText) => {
+  //   const maxChars = 1000;
   //   const inputLength = editorState.getCurrentContent().getPlainText().length;
-  //   if (inputLength + pastedText.length >= maxChars) {
+  //   if (pastedText.length >= maxChars) {
   //     return "handled";
   //   }
   // };
@@ -124,8 +138,12 @@ function CreateNotice() {
   return (
     <div className="dashboard-container">
       <Box className={classes.page}>
-        <Formik initialValues={initialValues} onSubmit={onSubmitHandler}>
-          {({ handleChange, handleSubmit, handleBlur, values }) => (
+        <Formik
+          validate={validate}
+          initialValues={initialValues}
+          onSubmit={onSubmitHandler}
+        >
+          {({ handleChange, handleSubmit, handleBlur, values, errors }) => (
             <form onSubmit={handleSubmit}>
               <Box className={classes.header}>
                 <Box className={classes.headerText}>Create Notice</Box>
@@ -166,7 +184,7 @@ function CreateNotice() {
                     inputProps={{
                       maxLength: 30,
                     }}
-                    helperText="You can type 30 characters or less"
+                    helperText={errors.title}
                   />
                 </Box>
               </Box>
@@ -183,6 +201,7 @@ function CreateNotice() {
                   onEditorStateChange={onEditorStateChange}
                   handleBeforeInput={_handleBeforeInput}
                   // handlePastedText={handlePastedText}
+                  helperText="Morenike"
                   toolbarCustomButtons={[<MentionAdder />, <ToggleToolbar />]}
                   toolbar={{
                     options: [
