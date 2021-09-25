@@ -27,7 +27,9 @@ class Dbnoticeboard:
                 }
             }
         try:
-            response = requests.post(url=self.centrifugo_url, headers=headers, json=command)
+            data = json.dumps(command)
+            response = requests.post(url=self.centrifugo_url, headers=headers, data=data)
+            print(response.json())
             return {
                         "status_code": response.status_code,
                         "message": response.json()
@@ -52,8 +54,8 @@ class Dbnoticeboard:
             print(res)
             return res
 
-        except requests.exceptions.RequestException as err:
-            print("OOps: There is a problem with the Request", err)
+        except Exception as e:
+            print("OOps: There is a problem with the Request", e)
         
 
     def save(self, collection_name, org_id, notice_data):
@@ -74,7 +76,6 @@ class Dbnoticeboard:
             r = requests.post(self.write_endpoint,data)
             print(r.text)
             r.raise_for_status()
-            self.post_to_centrifugo(notice_data)
         except requests.exceptions.RequestException as err:
             print("OOps: There is a problem with the Request", err)
         except requests.exceptions.HTTPError as errh:

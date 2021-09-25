@@ -1,23 +1,24 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { Formik } from "formik";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Hidden from "@material-ui/core/Hidden";
 import TextField from "@material-ui/core/TextField";
+import draftToMarkdown from "draftjs-to-markdown";
+import axios from "axios";
+import { Formik } from "formik";
 import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
-import draftToHtml from "draftjs-to-html";
 import { makeStyles } from "@material-ui/core/styles";
-import axios from "axios";
 
 import imageIcon from "./Text-editor/icons/attachment.svg";
-import "./CreateNotice.css";
-import "../noticeBoardComponent/Text-editor/Text-editor.css";
+import ErrorDialog from "./CreateNoticeDialogs/ErrorDialog";
+import SuccessDialog from "./CreateNoticeDialogs/SuccessDialog";
 import {
   MentionAdder,
   ToggleToolbar,
 } from "./Text-editor/Text_editor_features";
+import "../noticeBoardComponent/Text-editor/Text-editor.css";
+import "./CreateNotice.css";
 
 const useStyles = makeStyles((theme) => ({
   headerText: {
@@ -63,6 +64,7 @@ const initialValues = {
   message: "",
 };
 
+<<<<<<< HEAD
 //form validation && error messages
 const validate = (values) => {
   let errors = {};
@@ -76,15 +78,32 @@ const validate = (values) => {
 
   return errors;
 };
+=======
+const maxChars = 1000;
+>>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
 
 function CreateNotice() {
   const classes = useStyles();
+  const [errorTitle, setErrorTitle] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
 
+  const handleCloseErrorDialog = () => {
+    setOpenErrorDialog(false);
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setOpenSuccessDialog(false);
+  };
+
   const onEditorStateChange = (editorState) => {
     setEditorState(editorState);
+    setErrorMessage("");
+    document.getElementById("messageError").innerHTML = "";
   };
 
   //CREATE NOTICE API CALL STARTS
@@ -92,38 +111,45 @@ function CreateNotice() {
     baseURL: "https://noticeboard.zuri.chat/api/v1",
   });
 
-  const history = useHistory();
-
   const onSubmitHandler = async (values) => {
-    values.message = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    values.message = draftToMarkdown(
+      convertToRaw(editorState.getCurrentContent())
+    );
     const request = {
       title: values.title,
       message: values.message,
     };
+    if (values.title === "" || setEditorState === "") {
+      return (
+        setErrorMessage("Field cannot be empty"),
+        setErrorTitle("Field cannot be empty")
+      );
+    }
 
     try {
       const res = await api.post("/create", request);
       //Return input field to blank
       values.title = "";
       setEditorState("");
-      //routes to the admin view notice page
-      history.push({
-        pathname: "/noticeboard/admin-notice",
-      });
-      return console.log(res.data);
+
+      return setOpenSuccessDialog(true);
     } catch (err) {
-      console.log(err);
+      // console.log(err)
+      setOpenErrorDialog(true);
     }
   };
-  //CREATE NOTICE API CALL ENDS
 
-  const maxChars = 1000;
   const _handleBeforeInput = (input) => {
     const inputLength = editorState.getCurrentContent().getPlainText().length;
     if (input && inputLength >= maxChars) {
       return "handled";
     }
   };
+<<<<<<< HEAD
+=======
+
+  //validation for pasted text
+>>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
 
   //N.B: Comment: Untested codes. It throws a reference error that makes this page blank!!!
 
@@ -176,16 +202,27 @@ function CreateNotice() {
                     id="title"
                     name="title"
                     value={values.title}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setErrorTitle("");
+                    }}
                     onBlur={handleBlur}
                     placeholder="Enter the subject of your notice"
                     type="text"
                     variant="outlined"
                     inputProps={{
+                      minLength: 5,
                       maxLength: 30,
                     }}
+<<<<<<< HEAD
                     helperText={errors.title}
+=======
+                    // helperText="You can type 30 characters or less"
+>>>>>>> 648a6e95243e0f3418cfdc012c0b81ded6071858
                   />
+                  <p id="titleError" style={{ color: "red", fontSize: "14px" }}>
+                    {errorTitle}
+                  </p>
                 </Box>
               </Box>
               <Box pt="30px" pb="50px">
@@ -260,6 +297,9 @@ function CreateNotice() {
                     ],
                   }}
                 />
+                <p id="messageError" style={{ color: "red", fontSize: "14px" }}>
+                  {errorMessage}
+                </p>
               </Box>
               <Hidden lgUp>
                 <Box pt="20px" pb="30px" display="flex" justifyContent="center">
@@ -278,6 +318,14 @@ function CreateNotice() {
           )}
         </Formik>
       </Box>
+      <ErrorDialog
+        open={openErrorDialog}
+        handleClose={handleCloseErrorDialog}
+      />
+      <SuccessDialog
+        open={openSuccessDialog}
+        handleClose={handleCloseSuccessDialog}
+      />
     </div>
   );
 }
