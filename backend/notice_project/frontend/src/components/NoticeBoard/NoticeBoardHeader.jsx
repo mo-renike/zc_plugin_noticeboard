@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import "./NoticeBoardHeader.css";
 import Member1 from "../../assets/member-avatar.svg";
@@ -7,16 +7,44 @@ import Member3 from "../../assets/member-3.svg";
 import Member4 from "../../assets/member-4.svg";
 import { AddUsers } from "../AddUsers/AddUsers";
 import AddIcon from "@material-ui/icons/Add";
+import { UserInfoContext } from "../../App";
+import { UserContext } from "../../Data-fetcing";
 
 function NoticeBoardHeader() {
   const [openModal, setOpenModal] = useState(false)
+  const {allUsers, setAllUsers} = useContext(UserContext)
+  const userData = useContext(UserInfoContext)
+  
+  const getAllUsers = async () => {
+    try {
+      const requestOptions = {
+        method: "GET",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+      };
+      let response = await fetch(
+        `https://api.zuri.chat/organizations/${userData?.currentWorkspace}/members`,
+        requestOptions
+      );
+      let data = await response.json();
+       setAllUsers(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+
+  useEffect(() => {
+    getAllUsers();
+    
+  },[userData] );
 
   return (
     <div className="noticeboard-header">
       <div className="noticeboard-header-container">
         <div className="heading">Notice Board</div>
     {
-      openModal?  <AddUsers setOpenModal={setOpenModal} openModal={openModal} notice={true}/> : ""
+       openModal ? <AddUsers setOpenModal={setOpenModal} openModal={openModal} notice={true}/> : ""
     }
 
         <AvatarGroup className="members-avatars-grp" onClick={()=> setOpenModal(true)}>
@@ -39,7 +67,7 @@ function NoticeBoardHeader() {
             </div>
           </div>
 
-          <div className="member-total-count">145</div>
+           <div className="member-total-count">{allUsers?.length}</div>
         </AvatarGroup>
       </div>
     </div>
